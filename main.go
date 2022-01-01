@@ -1,8 +1,11 @@
 package main // import "hellojwx"
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
+	"encoding/base64"
+	"encoding/gob"
 	"fmt"
 	"log"
 	"reflect"
@@ -52,7 +55,7 @@ func ConvertToNullTypeHookFunc(f reflect.Type, t reflect.Type, data interface{})
 }
 
 func main() {
-	// 키 생성
+	/* 키 생성 */
 	var payload []byte
 	var keyset jwk.Set
 	alg := jwa.RS512
@@ -90,14 +93,25 @@ func main() {
 	realKey.Set(jwk.KeyIDKey, secret)
 	realKey.Set(jwk.AlgorithmKey, alg)
 
-	// 토큰 생성
-	token := jwt.New()
-
+	/* 데이터 */
 	user := User{
 		Name: null.NewString("John Doe", true),
 		Age:  null.NewInt(22, true),
 	}
 
+	/* 토큰 생성 */
+	token := jwt.New()
+
+	// GOB encoding
+	var userGobENC bytes.Buffer
+	err = gob.NewEncoder(&userGobENC).Encode(user)
+	if err != nil {
+		log.Printf("failed to encode gob: %s\n", err)
+		return
+	}
+	token.Set("gob", base64.StdEncoding.EncodeToString(userGobENC.Bytes()))
+
+	// Payload
 	token.Set("pcm", user)
 	token.Set(`foo`, `bar`)
 	token.Set(`kim`, `chi`)
@@ -111,7 +125,7 @@ func main() {
 
 	log.Println("Signed:", string(signed))
 
-	// 토큰 파싱
+	/* 토큰 파싱 */
 	token, err = jwt.Parse(
 		payload,
 		jwt.WithKeySet(keyset),
@@ -127,6 +141,7 @@ func main() {
 	pcm, valid := token.Get("pcm")
 	log.Println(pcm, valid)
 
+	// User struct decoding
 	u := User{}
 
 	cfg := &mapstructure.DecoderConfig{
@@ -146,4 +161,24 @@ func main() {
 	}
 
 	log.Println(u.Name, u.Age)
+
+	// GOB decoding
+	var userGOB User
+	gobSTR, valid := token.Get("gob")
+	log.Println(gobSTR, valid)
+
+	gobBytes, err := base64.StdEncoding.DecodeString(gobSTR.(string))
+	if err != nil {
+		log.Printf("failed to decode base64: %s\n", err)
+		return
+	}
+	userGobDEC := bytes.NewBuffer(gobBytes)
+
+	err = gob.NewDecoder(userGobDEC).Decode(&userGOB)
+	if err != nil {
+		log.Printf("failed to decode gob: %s\n", err)
+		return
+	}
+
+	log.Println(userGOB)
 }
