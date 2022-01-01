@@ -2,7 +2,11 @@ module hellojwx
 
 go 1.17
 
-require github.com/lestrrat-go/jwx v1.2.14
+require (
+	github.com/lestrrat-go/jwx v1.2.14
+	github.com/mitchellh/mapstructure v1.4.3
+	gopkg.in/guregu/null.v4 v4.0.0
+)
 
 require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
