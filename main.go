@@ -142,7 +142,7 @@ func main() {
 	log.Println(pcm, valid)
 
 	// User struct decoding
-	u := User{}
+	var u User
 
 	cfg := &mapstructure.DecoderConfig{
 		Result:     &u,
@@ -164,6 +164,7 @@ func main() {
 
 	// GOB decoding
 	var userGOB User
+
 	gobSTR, valid := token.Get("gob")
 	log.Println(gobSTR, valid)
 
