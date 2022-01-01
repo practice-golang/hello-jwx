@@ -1,4 +1,4 @@
-package main // import "hellojwx"
+package main // import "hello-jwx"
 
 import (
 	"bytes"
@@ -112,7 +112,7 @@ func main() {
 	token.Set("gob", base64.StdEncoding.EncodeToString(userGobENC.Bytes()))
 
 	// Payload
-	token.Set("pcm", user)
+	token.Set("token", user)
 	token.Set(`foo`, `bar`)
 	token.Set(`kim`, `chi`)
 	signed, err := jwt.Sign(token, alg, realKey)
@@ -138,7 +138,7 @@ func main() {
 	kim, valid := token.Get("foo")
 	log.Println(kim, valid)
 
-	pcm, valid := token.Get("pcm")
+	pcm, valid := token.Get("token")
 	log.Println(pcm, valid)
 
 	// User struct decoding

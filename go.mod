@@ -1,4 +1,4 @@
-module hellojwx
+module hello-jwx
 
 go 1.17
 
