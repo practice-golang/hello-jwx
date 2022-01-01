@@ -136,10 +136,10 @@ func main() {
 	}
 
 	kim, valid := token.Get("foo")
-	log.Println(kim, valid)
+	log.Println("kim:", kim, valid)
 
 	pcm, valid := token.Get("token")
-	log.Println(pcm, valid)
+	log.Println("pcm:", pcm, valid)
 
 	// User struct decoding
 	var u User
@@ -160,13 +160,13 @@ func main() {
 		return
 	}
 
-	log.Println(u.Name, u.Age)
+	log.Println("User pcm:", u)
 
 	// GOB decoding
 	var userGOB User
 
 	gobSTR, valid := token.Get("gob")
-	log.Println(gobSTR, valid)
+	log.Println("GOB string:", gobSTR, valid)
 
 	gobBytes, err := base64.StdEncoding.DecodeString(gobSTR.(string))
 	if err != nil {
@@ -181,5 +181,5 @@ func main() {
 		return
 	}
 
-	log.Println(userGOB)
+	log.Println("User GOB:", userGOB)
 }
